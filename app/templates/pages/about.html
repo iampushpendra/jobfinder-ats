@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}About — Fortune 500 Job Board{% endblock %}
+{% block meta_description %}We source live job openings directly from company ATS boards. No aggregators. No dead listings. Just real roles at real companies.{% endblock %}
+{% block og_title %}About Fortune 500 Job Board{% endblock %}
+{% block og_description %}We source live job openings directly from company ATS boards. No aggregators. No dead listings.{% endblock %}
+
+{% block content %}
+<article class="content-page">
+    <h1>About Fortune 500 Job Board</h1>
+
+    <p class="lede">Most job boards are graveyards. We built something different.</p>
+
+    <section class="content-section">
+        <h2>The Problem</h2>
+        <p>Job aggregators scrape listings once and never update them. You find the "perfect" role, spend an hour tailoring your resume, click apply — and the posting closed three weeks ago. Or worse, the company never posted it publicly in the first place.</p>
+        <p>Meanwhile, every top tech company runs their hiring on <strong>Greenhouse</strong>, <strong>Lever</strong>, or <strong>Ashby</strong>. Those boards are the source of truth. But nobody makes them easy to search across.</p>
+    </section>
+
+    <section class="content-section">
+        <h2>What We Do</h2>
+        <p>We poll the public ATS APIs of top companies directly — <strong>Stripe</strong>, <strong>OpenAI</strong>, <strong>Airbnb</strong>, <strong>Cloudflare</strong>, <strong>Coinbase</strong>, <strong>Datadog</strong>, and more — and surface every open role in one clean, searchable feed.</p>
+        <ul>
+            <li><strong>Live data:</strong> Refreshed directly from company job boards</li>
+            <li><strong>Direct apply:</strong> Every link goes straight to the company's official posting</li>
+            <li><strong>No dead listings:</strong> If a role closes, it disappears from our board</li>
+            <li><strong>Free favorites:</strong> Save roles and email yourself a shortlist</li>
+        </ul>
+    </section>
+
+    <section class="content-section">
+        <h2>Companies We Track</h2>
+        <div class="company-grid">
+            <span class="company-chip">Airbnb</span>
+            <span class="company-chip">Cloudflare</span>
+            <span class="company-chip">Coinbase</span>
+            <span class="company-chip">Datadog</span>
+            <span class="company-chip">GitLab</span>
+            <span class="company-chip">HP</span>
+            <span class="company-chip">OpenAI</span>
+            <span class="company-chip">Palantir</span>
+            <span class="company-chip">Pinterest</span>
+            <span class="company-chip">Ramp</span>
+            <span class="company-chip">Reddit</span>
+            <span class="company-chip">Spotify</span>
+            <span class="company-chip">Stripe</span>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <h2>Open Source</h2>
+        <p>This project is built to be fast, simple, and transparent. The code is open. The data comes straight from public APIs. There are no paywalls, no resume uploads, and no tracking beyond what we need to keep the boards synced.</p>
+    </section>
+
+    <section class="content-section cta-section">
+        <h2>Start Searching</h2>
+        <p>Browse <a href="/">all live openings</a>, filter by <a href="/locations/remote">remote roles</a>, or explore <a href="/roles/software-engineer">software engineer jobs</a> at top companies.</p>
+    </section>
+</article>
+{% endblock %}

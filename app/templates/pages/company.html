@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{{ company.name }} Jobs — Live Openings & Direct Apply Links{% endblock %}
+{% block meta_description %}Browse live {{ company.name }} jobs sourced directly from their official ATS board. Engineering, product, design, and more. Apply directly — no dead listings.{% endblock %}
+{% block meta_keywords %}{{ company.name }} jobs, {{ company.name }} careers, {{ company.name }} openings, {{ company.name }} engineering jobs{% endblock %}
+{% block og_title %}{{ company.name }} Jobs — Live Openings{% endblock %}
+{% block og_description %}Live {{ company.name }} job openings sourced directly from their official ATS board.{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "{{ company.name }}",
+    "url": "https://{{ company.slug }}.com",
+    "jobPosting": [
+        {% for job in jobs %}
+        {
+            "@type": "JobPosting",
+            "title": "{{ job.title }}",
+            "hiringOrganization": {"@type": "Organization", "name": "{{ job.company }}"},
+            "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressLocality": "{{ job.location }}"}},
+            "directApply": "true",
+            "url": "{{ job.url }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="content-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <span>{{ company.name }}</span>
+    </nav>
+
+    <h1>{{ company.name }} Jobs</h1>
+    <p class="lede">Live openings at <strong>{{ company.name }}</strong> sourced directly from their {{ company.ats }} board. Every link opens the official posting — apply in one click.</p>
+
+    {% if jobs %}
+    <section class="jobs-listing" aria-label="{{ company.name }} job openings">
+        <p class="results-count">{{ jobs | length }} open role{{ 's' if jobs | length > 1 else '' }}</p>
+        {% for job in jobs %}
+        <article class="card job-card">
+            <div class="card-top">
+                <div class="company">
+                    <span class="monogram" aria-hidden="true">{{ job.company[0] }}</span>
+                    <span class="company-name">{{ job.company }}</span>
+                </div>
+                {% if job.fortune500 %}
+                <span class="pill pill-f500">Fortune 500</span>
+                {% endif %}
+            </div>
+            <h2 class="job-title">
+                <a href="{{ job.url }}" target="_blank" rel="noopener">{{ job.title }}</a>
+            </h2>
+            <div class="meta">
+                <span class="chip">{{ job.location }}</span>
+                {% if job.function %}
+                <span class="chip">{{ job.function }}</span>
+                {% endif %}
+                <span class="chip chip-source">{{ job.source }}</span>
+            </div>
+            <div class="card-foot">
+                <span class="host">{{ job.url | replace('https://', '') | replace('http://', '') | replace('www.', '') }}</span>
+                <a class="btn btn-solid" href="{{ job.url }}" target="_blank" rel="noopener">Apply ↗</a>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}
+    <div class="empty">
+        <p class="empty-title">No active {{ company.name }} roles found right now.</p>
+        <p class="empty-hint">Check back soon — boards update daily. <a href="/">Browse all companies</a>.</p>
+    </div>
+    {% endif %}
+
+    <section class="related-links">
+        <h2>Related searches</h2>
+        <div class="link-group">
+            <a href="/locations/remote">Remote jobs</a>
+            <a href="/roles/software-engineer">Software engineer jobs</a>
+            <a href="/roles/product-manager">Product manager jobs</a>
+            <a href="/">All companies</a>
+        </div>
+    </section>
+</article>
+{% endblock %}

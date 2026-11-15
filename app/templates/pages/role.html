@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}{{ role }} Jobs at Top Tech Companies — Live Openings{% endblock %}
+{% block meta_description %}Find live {{ role }} jobs at top tech companies. Sourced directly from Greenhouse, Lever, and Ashby boards. Apply directly — no dead listings.{% endblock %}
+{% block meta_keywords %}{{ role }} jobs, {{ role }} openings, tech {{ role }} roles, software engineer jobs, product manager jobs{% endblock %}
+{% block og_title %}{{ role }} Jobs at Top Tech Companies{% endblock %}
+{% block og_description %}Live {{ role }} openings at Stripe, OpenAI, Airbnb, Cloudflare, and more. Sourced directly from official ATS boards.{% endblock %}
+
+{% block content %}
+<article class="content-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <span>{{ role }}</span>
+    </nav>
+
+    <h1>{{ role }} Jobs</h1>
+    <p class="lede">Live <strong>{{ role }}</strong> openings at top tech companies. Every listing is pulled directly from the company's official ATS board — no aggregators, no outdated postings.</p>
+
+    {% if jobs %}
+    <section class="jobs-listing" aria-label="{{ role }} job openings">
+        <p class="results-count">{{ jobs | length }} open role{{ 's' if jobs | length > 1 else '' }}</p>
+        {% for job in jobs %}
+        <article class="card job-card">
+            <div class="card-top">
+                <div class="company">
+                    <span class="monogram" aria-hidden="true">{{ job.company[0] }}</span>
+                    <span class="company-name">{{ job.company }}</span>
+                </div>
+                {% if job.fortune500 %}
+                <span class="pill pill-f500">Fortune 500</span>
+                {% endif %}
+            </div>
+            <h2 class="job-title">
+                <a href="{{ job.url }}" target="_blank" rel="noopener">{{ job.title }}</a>
+            </h2>
+            <div class="meta">
+                <span class="chip">{{ job.location }}</span>
+                {% if job.function %}
+                <span class="chip">{{ job.function }}</span>
+                {% endif %}
+                <span class="chip chip-source">{{ job.source }}</span>
+            </div>
+            <div class="card-foot">
+                <span class="host">{{ job.url | replace('https://', '') | replace('http://', '') | replace('www.', '') }}</span>
+                <a class="btn btn-solid" href="{{ job.url }}" target="_blank" rel="noopener">Apply ↗</a>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}
+    <div class="empty">
+        <p class="empty-title">No {{ role }} roles found right now.</p>
+        <p class="empty-hint">Try <a href="/">browsing all jobs</a> or check a related role.</p>
+    </div>
+    {% endif %}
+
+    <section class="related-links">
+        <h2>Explore related roles</h2>
+        <div class="link-group">
+            <a href="/roles/software-engineer">Software Engineer</a>
+            <a href="/roles/backend-engineer">Backend Engineer</a>
+            <a href="/roles/product-manager">Product Manager</a>
+            <a href="/roles/data-scientist">Data Scientist</a>
+            <a href="/roles/product-designer">Product Designer</a>
+        </div>
+    </section>
+</article>
+{% endblock %}

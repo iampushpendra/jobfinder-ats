@@ -2,7 +2,7 @@
 import os
 from urllib.parse import quote, urlencode
 
-from flask import Flask, jsonify, render_template, request, session
+from flask import Flask, jsonify, render_template, request, session, Response
 
 from . import sourcer
 
@@ -37,6 +37,70 @@ DEMO_JOBS = [
      "source": "demo", "fortune500": False},
 ]
 
+# ── Content & SEO data ─────────────────────────────────────────────────────
+ROLE_SLUGS = {
+    "software-engineer": "Software Engineer",
+    "product-manager": "Product Manager",
+    "data-scientist": "Data Scientist",
+    "product-designer": "Product Designer",
+    "backend-engineer": "Backend Engineer",
+    "frontend-engineer": "Frontend Engineer",
+    "devops-engineer": "DevOps Engineer",
+    "program-manager": "Program Manager",
+    "marketing-manager": "Marketing Manager",
+    "sales-representative": "Sales Representative",
+}
+
+LOCATION_SLUGS = {
+    "remote": "Remote",
+    "san-francisco": "San Francisco, CA",
+    "new-york": "New York, NY",
+    "seattle": "Seattle, WA",
+    "austin": "Austin, TX",
+    "london": "London",
+    "bengaluru": "Bengaluru, India",
+    "dublin": "Dublin",
+    "toronto": "Toronto",
+}
+
+BLOG_POSTS = [
+    {
+        "slug": "apply-direct-greenhouse-linkedin",
+        "title": "How to Apply Directly on Greenhouse (and Why It Beats LinkedIn)",
+        "description": "Skip the middleman. Here's why applying directly through Greenhouse, Lever, and Ashby gets your resume seen faster.",
+        "date": "2026-11-10",
+        "category": "Job Search Tips",
+    },
+    {
+        "slug": "openai-jobs-application-tips",
+        "title": "OpenAI Jobs: Where to Find Them and How to Stand Out",
+        "description": "A complete guide to finding live OpenAI openings and making your application competitive.",
+        "date": "2026-11-08",
+        "category": "Company Guides",
+    },
+    {
+        "slug": "stripe-careers-application-guide",
+        "title": "Stripe Careers: Application Tips + Live Openings",
+        "description": "Everything you need to know about applying to Stripe — engineering, product, design, and operations roles.",
+        "date": "2026-11-05",
+        "category": "Company Guides",
+    },
+    {
+        "slug": "remote-jobs-top-tech-companies",
+        "title": "Remote Jobs at Top Tech Companies — November 2026",
+        "description": "The best remote openings at Airbnb, Stripe, OpenAI, Datadog, and more. Updated weekly.",
+        "date": "2026-11-01",
+        "category": "Remote Work",
+    },
+    {
+        "slug": "why-aggregators-show-dead-listings",
+        "title": "Why Job Aggregators Show Dead Listings (and How We Fix It)",
+        "description": "That perfect role you found on a job board? It might have closed weeks ago. Here's what aggregators won't tell you.",
+        "date": "2026-10-28",
+        "category": "Job Search Tips",
+    },
+]
+
 
 def create_app(test_config=None):
     app = Flask(__name__, template_folder="templates", static_folder="../static")
@@ -56,6 +120,97 @@ def create_app(test_config=None):
         return render_template("index.html",
                                favorites=session.get("favorites", []),
                                stats=stats())
+
+    # ── SEO landing pages ────────────────────────────────────────────
+
+    @app.route("/about")
+    def about():
+        return render_template("pages/about.html", stats=stats())
+
+    @app.route("/companies/<company_key>")
+    def company_page(company_key):
+        cfg = sourcer.COMPANIES.get(company_key)
+        if not cfg:
+            return render_template("pages/404.html", stats=stats()), 404
+        ensure_synced()
+        jobs = sourcer.search_jobs() if stats()["total"] else []
+        jobs = [j for j in jobs if j["company"].lower() == cfg["name"].lower()]
+        return render_template("pages/company.html",
+                                 company=cfg,
+                                 company_key=company_key,
+                                 jobs=jobs,
+                                 stats=stats())
+
+    @app.route("/roles/<role_slug>")
+    def role_page(role_slug):
+        role_title = ROLE_SLUGS.get(role_slug)
+        if not role_title:
+            return render_template("pages/404.html", stats=stats()), 404
+        ensure_synced()
+        jobs = sourcer.search_jobs(function=role_title) if stats()["total"] else []
+        return render_template("pages/role.html",
+                               role=role_title,
+                               role_slug=role_slug,
+                               jobs=jobs,
+                               stats=stats())
+
+    @app.route("/locations/<loc_slug>")
+    def location_page(loc_slug):
+        location = LOCATION_SLUGS.get(loc_slug)
+        if not location:
+            return render_template("pages/404.html", stats=stats()), 404
+        ensure_synced()
+        jobs = sourcer.search_jobs(location=location) if stats()["total"] else []
+        return render_template("pages/location.html",
+                               location=location,
+                               loc_slug=loc_slug,
+                               jobs=jobs,
+                               stats=stats())
+
+    # ── Blog ─────────────────────────────────────────────────────────
+
+    @app.route("/blog")
+    def blog_index():
+        return render_template("blog/index.html", posts=BLOG_POSTS, stats=stats())
+
+    @app.route("/blog/<slug>")
+    def blog_post(slug):
+        post = next((p for p in BLOG_POSTS if p["slug"] == slug), None)
+        if not post:
+            return render_template("pages/404.html", stats=stats()), 404
+        return render_template(f"blog/{slug}.html", post=post, posts=BLOG_POSTS, stats=stats())
+
+    # ── SEO utilities ────────────────────────────────────────────────
+
+    @app.route("/robots.txt")
+    def robots():
+        return Response("""User-agent: *
+Allow: /
+Sitemap: /sitemap.xml
+""", mimetype="text/plain")
+
+    @app.route("/sitemap.xml")
+    def sitemap():
+        base = request.url_root.rstrip("/")
+        urls = [f"{base}/", f"{base}/about", f"{base}/blog"]
+
+        for key in sourcer.COMPANIES:
+            urls.append(f"{base}/companies/{key}")
+        for slug in ROLE_SLUGS:
+            urls.append(f"{base}/roles/{slug}")
+        for slug in LOCATION_SLUGS:
+            urls.append(f"{base}/locations/{slug}")
+        for post in BLOG_POSTS:
+            urls.append(f"{base}/blog/{post['slug']}")
+
+        xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        for u in urls:
+            xml += f"  <url><loc>{u}</loc></url>\n"
+        xml += "</urlset>\n"
+        return Response(xml, mimetype="application/xml")
+
+    # ── API routes (unchanged) ──────────────────────────────────────
 
     @app.route("/api/stats")
     def api_stats():
@@ -139,7 +294,9 @@ def create_app(test_config=None):
 
     @app.errorhandler(404)
     def not_found(e):
-        return jsonify({"error": "not found"}), 404
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "not found"}), 404
+        return render_template("pages/404.html", stats=stats()), 404
 
     return app
 

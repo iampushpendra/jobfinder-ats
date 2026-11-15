@@ -16,10 +16,10 @@ def fake_posts(slug, name, fortune500):
     return [
         {"id": "101", "company": name, "title": "Staff Engineer", "location": "Remote",
          "function": "Engineering", "url": "https://boards.example/101",
-         "source": "fake", "fortune500": bool(fortune500)},
+         "source": "fake", "fortune500": bool(fortune500), "posted": ""},
         {"id": "102", "company": name, "title": "Product Designer", "location": "London",
          "function": "Design", "url": "https://boards.example/102",
-         "source": "fake", "fortune500": bool(fortune500)},
+         "source": "fake", "fortune500": bool(fortune500), "posted": ""},
     ]
 
 
@@ -49,7 +49,6 @@ class SourcerTest(unittest.TestCase):
         sourcer.sync(companies=FAKE_COMPANIES, path=other)
         self.assertEqual(sourcer.counts(other)["total"], 2)
 
-        sourcer.FETCHERS["fake"] = lambda *a: fake_posts(*a)[:1]  # 102 disappears
         sourcer.FETCHERS["fake"] = lambda slug, name, f: [{
             "id": "101", "company": name, "title": "Staff Engineer", "location": "Remote",
             "function": "Engineering", "url": "https://boards.example/101",
@@ -101,6 +100,43 @@ class AppTest(unittest.TestCase):
         s = self.client.get("/api/stats").get_json()
         self.assertEqual(s["total"], 2)
         self.assertEqual(s["fortune500_jobs"], 2)
+
+    def test_about_page(self):
+        body = self.client.get("/about").get_data(as_text=True)
+        self.assertIn("We source live job openings", body)
+        self.assertEqual(self.client.get("/about").status_code, 200)
+
+    def test_blog_index(self):
+        body = self.client.get("/blog").get_data(as_text=True)
+        self.assertIn("Job Search Tips", body)
+        self.assertIn("Company Guides", body)
+
+    def test_blog_post(self):
+        body = self.client.get("/blog/apply-direct-greenhouse-linkedin").get_data(as_text=True)
+        self.assertIn("Greenhouse", body)
+        self.assertIn("LinkedIn", body)
+
+    def test_company_page(self):
+        body = self.client.get("/companies/stripe").get_data(as_text=True)
+        self.assertIn("Stripe Jobs", body)
+        self.assertIn("greenhouse", body)
+
+    def test_role_page(self):
+        body = self.client.get("/roles/software-engineer").get_data(as_text=True)
+        self.assertIn("Software Engineer", body)
+
+    def test_location_page(self):
+        body = self.client.get("/locations/remote").get_data(as_text=True)
+        self.assertIn("Remote", body)
+
+    def test_sitemap(self):
+        body = self.client.get("/sitemap.xml").get_data(as_text=True)
+        self.assertIn("<urlset", body)
+        self.assertIn("/blog/apply-direct-greenhouse-linkedin", body)
+
+    def test_robots_txt(self):
+        body = self.client.get("/robots.txt").get_data(as_text=True)
+        self.assertIn("Sitemap:", body)
 
 
 if __name__ == "__main__":

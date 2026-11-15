@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     url TEXT NOT NULL,
     source TEXT NOT NULL,
     fortune500 INTEGER NOT NULL DEFAULT 0,
+    posted TEXT,
     first_seen TEXT NOT NULL,
     last_seen TEXT NOT NULL
 );
@@ -59,7 +60,22 @@ def db_path() -> str:
 def _connect(path: str) -> sqlite3.Connection:
     conn = sqlite3.connect(path)
     conn.executescript(SCHEMA)
+    if "posted" not in {r[1] for r in conn.execute("PRAGMA table_info(jobs)")}:
+        conn.execute("ALTER TABLE jobs ADD COLUMN posted TEXT")
     return conn
+
+
+def _norm_iso(value):
+    """Normalise ATS timestamps (ISO strings or epoch ms) to UTC ISO strings."""
+    if not value:
+        return None
+    if isinstance(value, (int, float)):
+        return datetime.fromtimestamp(value / 1000, tz=timezone.utc).isoformat(timespec="seconds")
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed.astimezone(timezone.utc).isoformat(timespec="seconds")
 
 
 def _job(row, company, source, fortune500):
@@ -72,6 +88,7 @@ def _job(row, company, source, fortune500):
         "url": row["url"],
         "source": source,
         "fortune500": 1 if fortune500 else 0,
+        "posted": _norm_iso(row.get("posted")),
     }
 
 
@@ -87,6 +104,7 @@ def fetch_greenhouse(slug: str, name: str, fortune500: bool):
             "location": (j.get("location") or {}).get("name"),
             "function": ", ".join(d.get("name", "") for d in j.get("departments") or []),
             "url": j.get("absolute_url"),
+            "posted": j.get("updated_at"),
         }, name, "greenhouse", fortune500))
     return jobs
 
@@ -103,6 +121,7 @@ def fetch_lever(slug: str, name: str, fortune500: bool):
             "location": categories.get("location"),
             "function": categories.get("team") or categories.get("department"),
             "url": j.get("hostedUrl"),
+            "posted": j.get("createdAt"),
         }, name, "lever", fortune500))
     return jobs
 
@@ -120,6 +139,7 @@ def fetch_ashby(slug: str, name: str, fortune500: bool):
             "location": j.get("location"),
             "function": j.get("department"),
             "url": j.get("jobUrl"),
+            "posted": j.get("publishedAt"),
         }, name, "ashby", fortune500))
         if len(jobs) == MAX_JOBS_PER_COMPANY:
             break
@@ -159,17 +179,22 @@ def sync(companies=None, path=None) -> dict:
     for key, jobs in results:
         if not jobs:
             continue
+        # Debug: ensure posted exists
+        for j in jobs:
+            if "posted" not in j:
+                j["posted"] = ""
         conn.executemany("""
-            INSERT INTO jobs (id, company, title, location, function, url, source, fortune500, first_seen, last_seen)
-            VALUES (:id, :company, :title, :location, :function, :url, :source, :fortune500, :now, :now)
+            INSERT INTO jobs (id, company, title, location, function, url, source, fortune500, posted, first_seen, last_seen)
+            VALUES (:id, :company, :title, :location, :function, :url, :source, :fortune500, :posted, :now, :now)
             ON CONFLICT(id) DO UPDATE SET
                 title = excluded.title, location = excluded.location, function = excluded.function,
                 url = excluded.url, source = excluded.source, fortune500 = excluded.fortune500,
-                last_seen = excluded.last_seen
+                posted = excluded.posted, last_seen = excluded.last_seen
         """, [dict(j, now=now) for j in jobs])
         # Postings gone from the board are no longer listed.
-        conn.execute("DELETE FROM jobs WHERE company = ? AND last_seen != ?",
-                     (companies[key]["name"], now))
+        marks = ",".join("?" * len(jobs))
+        conn.execute(f"DELETE FROM jobs WHERE company = ? AND id NOT IN ({marks})",
+                     (companies[key]["name"], *[j["id"] for j in jobs]))
 
     conn.execute("INSERT INTO meta (key, value) VALUES ('last_sync', ?) "
                  "ON CONFLICT(key) DO UPDATE SET value = excluded.value", (now,))
@@ -206,7 +231,7 @@ def counts(path=None) -> dict:
 
 
 def search_jobs(function="", location="", ids=None, path=None):
-    sql = ("SELECT id, company, title, location, function, url, source, fortune500 "
+    sql = ("SELECT id, company, title, location, function, url, source, fortune500, posted "
            "FROM jobs")
     where, params = [], []
     if function:
@@ -222,7 +247,7 @@ def search_jobs(function="", location="", ids=None, path=None):
         params.extend(ids)
     if where:
         sql += " WHERE " + " AND ".join(where)
-    sql += " ORDER BY company, title"
+    sql += " ORDER BY posted DESC, company, title"
 
     conn = _connect(path or db_path())
     rows = conn.execute(sql, params).fetchall()
@@ -230,6 +255,7 @@ def search_jobs(function="", location="", ids=None, path=None):
     return [{
         "id": r[0], "company": r[1], "title": r[2], "location": r[3],
         "function": r[4], "url": r[5], "source": r[6], "fortune500": bool(r[7]),
+        "posted": r[8],
     } for r in rows]
 
 

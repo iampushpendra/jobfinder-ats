@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>{% block title %}Fortune 500 Job Board{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Live roles sourced from the job boards of Fortune 500 and top tech companies. Apply directly — no aggregators, no dead listings.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}tech jobs, software engineer jobs, product manager jobs, remote jobs, fortune 500 jobs, startup jobs, greenhouse jobs, lever jobs, ashby jobs{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}Fortune 500 Job Board{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Live roles sourced from the job boards of Fortune 500 and top tech companies.{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="canonical" href="{{ request.url }}">
+    <link rel="stylesheet" href="/static/style.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Fortune 500 Job Board",
+        "url": "{{ request.url_root }}",
+        "description": "Live roles sourced from the job boards of Fortune 500 and top tech companies."
+    }
+    </script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <header class="site-header">
+        <div class="wrap header-bar">
+            <a class="brand" href="/">
+                <span class="brand-mark" aria-hidden="true">F5</span>
+                <span class="brand-name">Fortune 500 <span>Job Board</span></span>
+            </a>
+            <nav class="header-actions">
+                <a href="/blog" class="btn btn-ghost">Blog</a>
+                <a href="/about" class="btn btn-ghost">About</a>
+                <button id="emailFavorites" class="btn btn-ghost" type="button">Email favorites</button>
+                <button id="syncBtn" class="btn btn-solid" type="button">Refresh jobs</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="wrap">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="wrap site-footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="/about">About</a>
+                <a href="/blog">Blog</a>
+                <a href="/robots.txt">robots.txt</a>
+                <a href="/sitemap.xml">Sitemap</a>
+            </div>
+            <span class="footer-source">Sources: Greenhouse · Lever · Ashby</span>
+            <span>Last synced <span id="lastSync">{{ stats.last_sync or 'never' }}</span></span>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,236 +1,257 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Fortune 500 Job Board</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light dark">
-    <meta name="description" content="Live roles sourced from the job boards of Fortune 500 and top companies.">
-    <link rel="stylesheet" href="/static/style.css">
-</head>
-<body>
-    <header class="site-header">
-        <div class="wrap header-bar">
-            <a class="brand" href="/">
-                <span class="brand-mark" aria-hidden="true">F5</span>
-                <span class="brand-name">Fortune 500 <span>Job Board</span></span>
-            </a>
-            <nav class="header-actions">
-                <button id="emailFavorites" class="btn btn-ghost" type="button">Email favorites</button>
-                <button id="syncBtn" class="btn btn-solid" type="button">Refresh jobs</button>
-            </nav>
+{% extends "base.html" %}
+
+{% block title %}Fortune 500 Job Board — Live Tech Jobs from Greenhouse, Lever & Ashby{% endblock %}
+{% block meta_description %}Find live tech jobs at top companies. Every listing is sourced directly from Greenhouse, Lever, and Ashby ATS boards — no dead listings, no aggregators.{% endblock %}
+{% block meta_keywords %}tech jobs, software engineer jobs, product manager jobs, remote jobs, fortune 500 jobs, startup jobs, greenhouse jobs, lever jobs, ashby jobs{% endblock %}
+{% block og_title %}Fortune 500 Job Board — Live Tech Jobs{% endblock %}
+{% block og_description %}Find live tech jobs at top companies. Every listing is sourced directly from Greenhouse, Lever, and Ashby ATS boards.{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    "name": "Live Tech Job Board",
+    "hiringOrganization": {
+        "@type": "Organization",
+        "name": "Fortune 500 Job Board"
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Good roles, straight from the source.</h1>
+    <p class="lede">Sourced live from Greenhouse, Lever and Ashby boards. Every apply link opens the company's own posting — no aggregators, no dead listings.</p>
+
+    <dl class="stats">
+        <div class="stat">
+            <dt>Open roles</dt>
+            <dd id="stat-total">{{ stats.total }}</dd>
         </div>
-    </header>
+        <div class="stat">
+            <dt>Companies</dt>
+            <dd id="stat-companies">{{ stats.companies }}</dd>
+        </div>
+        <div class="stat">
+            <dt>Fortune 500 roles</dt>
+            <dd id="stat-f500">{{ stats.fortune500_jobs }}</dd>
+        </div>
+        <div class="stat">
+            <dt>Favorites</dt>
+            <dd id="fav-count">0</dd>
+        </div>
+    </dl>
+</section>
 
-    <main class="wrap">
-        <section class="hero">
-            <h1>Good roles, straight from the source.</h1>
-            <p class="lede">Sourced live from Greenhouse, Lever and Ashby boards. Every apply link opens the company's own posting — no aggregators, no dead listings.</p>
+<section class="browse-links" aria-label="Browse by category">
+    <h2 class="sr-only">Browse jobs</h2>
+    <div class="browse-grid">
+        <a class="browse-card" href="/roles/software-engineer">
+            <span class="browse-icon">💻</span>
+            <span class="browse-label">Software Engineer</span>
+        </a>
+        <a class="browse-card" href="/roles/product-manager">
+            <span class="browse-icon">📦</span>
+            <span class="browse-label">Product Manager</span>
+        </a>
+        <a class="browse-card" href="/roles/data-scientist">
+            <span class="browse-icon">📊</span>
+            <span class="browse-label">Data Scientist</span>
+        </a>
+        <a class="browse-card" href="/locations/remote">
+            <span class="browse-icon">🏠</span>
+            <span class="browse-label">Remote Jobs</span>
+        </a>
+        <a class="browse-card" href="/companies/stripe">
+            <span class="browse-icon">💳</span>
+            <span class="browse-label">Stripe</span>
+        </a>
+        <a class="browse-card" href="/companies/openai">
+            <span class="browse-icon">🤖</span>
+            <span class="browse-label">OpenAI</span>
+        </a>
+        <a class="browse-card" href="/companies/airbnb">
+            <span class="browse-icon">🏠</span>
+            <span class="browse-label">Airbnb</span>
+        </a>
+        <a class="browse-card" href="/blog">
+            <span class="browse-icon">✍️</span>
+            <span class="browse-label">Job Search Tips</span>
+        </a>
+    </div>
+</section>
 
-            <dl class="stats">
-                <div class="stat">
-                    <dt>Open roles</dt>
-                    <dd id="stat-total">{{ stats.total }}</dd>
-                </div>
-                <div class="stat">
-                    <dt>Companies</dt>
-                    <dd id="stat-companies">{{ stats.companies }}</dd>
-                </div>
-                <div class="stat">
-                    <dt>Fortune 500 roles</dt>
-                    <dd id="stat-f500">{{ stats.fortune500_jobs }}</dd>
-                </div>
-                <div class="stat">
-                    <dt>Favorites</dt>
-                    <dd id="fav-count">0</dd>
-                </div>
-            </dl>
-        </section>
+<section class="controls" aria-label="Filters">
+    <div class="fields">
+        <div class="field">
+            <label class="sr-only" for="filterFunction">Filter by function</label>
+            <input id="filterFunction" class="input" type="search" autocomplete="off"
+                   placeholder="Function — engineering, design, sales…">
+        </div>
+        <div class="field">
+            <label class="sr-only" for="filterLocation">Filter by location</label>
+            <input id="filterLocation" class="input" type="search" autocomplete="off"
+                   placeholder="Location — remote, London, New York…">
+        </div>
+    </div>
+    <label class="check">
+        <input type="checkbox" id="favoriteFilter">
+        Favorites only
+    </label>
+</section>
 
-        <section class="controls" aria-label="Filters">
-            <div class="fields">
-                <div class="field">
-                    <label class="sr-only" for="filterFunction">Filter by function</label>
-                    <input id="filterFunction" class="input" type="search" autocomplete="off"
-                           placeholder="Function — engineering, design, sales…">
-                </div>
-                <div class="field">
-                    <label class="sr-only" for="filterLocation">Filter by location</label>
-                    <input id="filterLocation" class="input" type="search" autocomplete="off"
-                           placeholder="Location — remote, London, New York…">
-                </div>
-            </div>
-            <label class="check">
-                <input type="checkbox" id="favoriteFilter">
-                Favorites only
-            </label>
-        </section>
+<section class="jobs" id="jobsList" aria-live="polite" aria-busy="true">
+    <div class="card skeleton" aria-hidden="true"></div>
+    <div class="card skeleton" aria-hidden="true"></div>
+    <div class="card skeleton" aria-hidden="true"></div>
+    <div class="card skeleton" aria-hidden="true"></div>
+</section>
+{% endblock %}
 
-        <section class="jobs" id="jobsList" aria-live="polite" aria-busy="true">
-            <div class="card skeleton" aria-hidden="true"></div>
-            <div class="card skeleton" aria-hidden="true"></div>
-            <div class="card skeleton" aria-hidden="true"></div>
-            <div class="card skeleton" aria-hidden="true"></div>
-        </section>
-    </main>
+{% block scripts %}
+<script>
+    let favorites = {{ favorites | tojson }};
 
-    <footer class="wrap site-footer">
-        <span>Sources: Greenhouse · Lever · Ashby</span>
-        <span>Last synced <span id="lastSync">{{ stats.last_sync or 'never' }}</span></span>
-    </footer>
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => (
+        {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]
+    ));
+    const fmt = n => Number(n || 0).toLocaleString('en-US');
+    const host = url => {
+        try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; }
+    };
 
-    <script>
-        // Favorites come from the server session; tojson keeps this valid JS and HTML-safe.
-        let favorites = {{ favorites | tojson }};
-
-        // Job fields originate in third-party payloads, so escape anything injected as HTML.
-        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => (
-            {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]
-        ));
-        const fmt = n => Number(n || 0).toLocaleString('en-US');
-        const host = url => {
-            try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; }
-        };
-
-        async function fetchJobs() {
-            const params = new URLSearchParams({
-                function: document.getElementById('filterFunction').value.trim(),
-                location: document.getElementById('filterLocation').value.trim(),
-                favorite: document.getElementById('favoriteFilter').checked ? 'true' : 'false'
-            });
-            const res = await fetch(`/api/jobs?${params}`);
-            const data = await res.json();
-            renderJobs(data.jobs);
-        }
-
-        function renderJobs(jobs) {
-            const container = document.getElementById('jobsList');
-            container.setAttribute('aria-busy', 'false');
-
-            if (!jobs || !jobs.length) {
-                container.innerHTML = `
-                    <div class="empty">
-                        <p class="empty-title">No roles match those filters.</p>
-                        <p class="empty-hint">Try a broader function or location.</p>
-                    </div>`;
-                return;
-            }
-
-            container.innerHTML = jobs.map(job => {
-                const isFav = favorites.includes(job.id);
-                const initial = (job.company || '?').trim().charAt(0).toUpperCase();
-                return `
-                    <article class="card job-card${isFav ? ' is-fav' : ''}" data-id="${esc(job.id)}">
-                        <div class="card-top">
-                            <div class="company">
-                                <span class="monogram" aria-hidden="true">${esc(initial)}</span>
-                                <span class="company-name">${esc(job.company)}</span>
-                            </div>
-                            ${job.fortune500 ? '<span class="pill pill-f500">Fortune 500</span>' : ''}
-                        </div>
-
-                        <h2 class="job-title">
-                            <a href="${esc(job.url)}" target="_blank" rel="noopener">${esc(job.title)}</a>
-                        </h2>
-
-                        <div class="meta">
-                            <span class="chip">${esc(job.location)}</span>
-                            ${job.function ? `<span class="chip">${esc(job.function)}</span>` : ''}
-                            <span class="chip chip-source">${esc(job.source)}</span>
-                        </div>
-
-                        <div class="card-foot">
-                            <span class="host">${esc(host(job.url))}</span>
-                            <div class="card-actions">
-                                <button class="fav-btn" type="button"
-                                        aria-pressed="${isFav}"
-                                        aria-label="${isFav ? 'Remove from favorites' : 'Save to favorites'}">
-                                    ${isFav ? '★' : '☆'}
-                                </button>
-                                <a class="btn btn-solid" href="${esc(job.url)}" target="_blank" rel="noopener">Apply ↗</a>
-                            </div>
-                        </div>
-                    </article>`;
-            }).join('');
-        }
-
-        async function toggleFavorite(jobId) {
-            const res = await fetch('/api/toggle-favorite', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ job_id: jobId })
-            });
-            const data = await res.json();
-            if (data.error) return;
-
-            favorites = data.favorites;
-            const card = document.querySelector(`.job-card[data-id="${CSS.escape(jobId)}"]`);
-            if (card) {
-                card.classList.toggle('is-fav', data.favorite);
-                const btn = card.querySelector('.fav-btn');
-                btn.textContent = data.favorite ? '★' : '☆';
-                btn.setAttribute('aria-pressed', String(data.favorite));
-                btn.setAttribute('aria-label', data.favorite ? 'Remove from favorites' : 'Save to favorites');
-            }
-            renderFavoritesBadge();
-        }
-
-        function renderFavoritesBadge() {
-            document.getElementById('fav-count').textContent = fmt(favorites.length);
-        }
-
-        async function emailFavorites() {
-            if (!favorites.length) return;
-            const res = await fetch('/api/email-jobs', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ job_ids: favorites })
-            });
-            const data = await res.json();
-            if (data.mailto) window.location.href = data.mailto;
-        }
-
-        async function loadStats() {
-            const res = await fetch('/api/stats');
-            const s = await res.json();
-            document.getElementById('stat-total').textContent = fmt(s.total);
-            document.getElementById('stat-companies').textContent = fmt(s.companies);
-            document.getElementById('stat-f500').textContent = fmt(s.fortune500_jobs);
-            document.getElementById('lastSync').textContent = s.last_sync
-                ? new Date(s.last_sync).toLocaleString() : 'never';
-        }
-
-        async function syncNow() {
-            const btn = document.getElementById('syncBtn');
-            btn.disabled = true;
-            btn.textContent = 'Syncing…';
-            await fetch('/api/sync', { method: 'POST' });
-            await Promise.all([loadStats(), fetchJobs()]);
-            btn.disabled = false;
-            btn.textContent = 'Refresh jobs';
-        }
-
-        // Event wiring
-        document.getElementById('jobsList').addEventListener('click', e => {
-            const btn = e.target.closest('.fav-btn');
-            if (btn) toggleFavorite(btn.closest('.job-card').dataset.id);
+    async function fetchJobs() {
+        const params = new URLSearchParams({
+            function: document.getElementById('filterFunction').value.trim(),
+            location: document.getElementById('filterLocation').value.trim(),
+            favorite: document.getElementById('favoriteFilter').checked ? 'true' : 'false'
         });
+        const res = await fetch(`/api/jobs?${params}`);
+        const data = await res.json();
+        renderJobs(data.jobs);
+    }
 
-        let filterTimer;
-        const filterLater = () => {
-            clearTimeout(filterTimer);
-            filterTimer = setTimeout(fetchJobs, 300);
-        };
+    function renderJobs(jobs) {
+        const container = document.getElementById('jobsList');
+        container.setAttribute('aria-busy', 'false');
 
-        document.getElementById('filterFunction').addEventListener('input', filterLater);
-        document.getElementById('filterLocation').addEventListener('input', filterLater);
-        document.getElementById('favoriteFilter').addEventListener('change', fetchJobs);
-        document.getElementById('emailFavorites').addEventListener('click', emailFavorites);
-        document.getElementById('syncBtn').addEventListener('click', syncNow);
+        if (!jobs || !jobs.length) {
+            container.innerHTML = `
+                <div class="empty">
+                    <p class="empty-title">No roles match those filters.</p>
+                    <p class="empty-hint">Try a broader function or location.</p>
+                </div>`;
+            return;
+        }
 
+        container.innerHTML = jobs.map(job => {
+            const isFav = favorites.includes(job.id);
+            const initial = (job.company || '?').trim().charAt(0).toUpperCase();
+            return `
+                <article class="card job-card${isFav ? ' is-fav' : ''}" data-id="${esc(job.id)}">
+                    <div class="card-top">
+                        <div class="company">
+                            <span class="monogram" aria-hidden="true">${esc(initial)}</span>
+                            <span class="company-name">${esc(job.company)}</span>
+                        </div>
+                        ${job.fortune500 ? '<span class="pill pill-f500">Fortune 500</span>' : ''}
+                    </div>
+
+                    <h2 class="job-title">
+                        <a href="${esc(job.url)}" target="_blank" rel="noopener">${esc(job.title)}</a>
+                    </h2>
+
+                    <div class="meta">
+                        <span class="chip">${esc(job.location)}</span>
+                        ${job.function ? `<span class="chip">${esc(job.function)}</span>` : ''}
+                        <span class="chip chip-source">${esc(job.source)}</span>
+                    </div>
+
+                    <div class="card-foot">
+                        <span class="host">${esc(host(job.url))}</span>
+                        <div class="card-actions">
+                            <button class="fav-btn" type="button"
+                                    aria-pressed="${isFav}"
+                                    aria-label="${isFav ? 'Remove from favorites' : 'Save to favorites'}">
+                                ${isFav ? '★' : '☆'}
+                            </button>
+                            <a class="btn btn-solid" href="${esc(job.url)}" target="_blank" rel="noopener">Apply ↗</a>
+                        </div>
+                    </div>
+                </article>`;
+        }).join('');
+    }
+
+    async function toggleFavorite(jobId) {
+        const res = await fetch('/api/toggle-favorite', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ job_id: jobId })
+        });
+        const data = await res.json();
+        if (data.error) return;
+
+        favorites = data.favorites;
+        const card = document.querySelector(`.job-card[data-id="${CSS.escape(jobId)}"]`);
+        if (card) {
+            card.classList.toggle('is-fav', data.favorite);
+            const btn = card.querySelector('.fav-btn');
+            btn.textContent = data.favorite ? '★' : '☆';
+            btn.setAttribute('aria-pressed', String(data.favorite));
+            btn.setAttribute('aria-label', data.favorite ? 'Remove from favorites' : 'Save to favorites');
+        }
         renderFavoritesBadge();
-        loadStats();
-        fetchJobs();
-    </script>
-</body>
-</html>
+    }
+
+    function renderFavoritesBadge() {
+        document.getElementById('fav-count').textContent = fmt(favorites.length);
+    }
+
+    async function emailFavorites() {
+        if (!favorites.length) return;
+        const res = await fetch('/api/email-jobs', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ job_ids: favorites })
+        });
+        const data = await res.json();
+        if (data.mailto) window.location.href = data.mailto;
+    }
+
+    async function loadStats() {
+        const res = await fetch('/api/stats');
+        const s = await res.json();
+        document.getElementById('stat-total').textContent = fmt(s.total);
+        document.getElementById('stat-companies').textContent = fmt(s.companies);
+        document.getElementById('stat-f500').textContent = fmt(s.fortune500_jobs);
+        document.getElementById('lastSync').textContent = s.last_sync || 'never';
+    }
+
+    async function refreshJobs() {
+        const btn = document.getElementById('syncBtn');
+        btn.disabled = true;
+        await fetch('/api/sync', {method: 'POST'});
+        await Promise.all([fetchJobs(), loadStats()]);
+        btn.disabled = false;
+    }
+
+    document.getElementById('jobsList').addEventListener('click', e => {
+        const btn = e.target.closest('.fav-btn');
+        if (!btn) return;
+        const card = btn.closest('.job-card');
+        if (card) toggleFavorite(card.dataset.id);
+    });
+
+    document.getElementById('filterFunction').addEventListener('input', () => { fetchJobs(); });
+    document.getElementById('filterLocation').addEventListener('input', () => { fetchJobs(); });
+    document.getElementById('favoriteFilter').addEventListener('change', () => { fetchJobs(); });
+    document.getElementById('syncBtn').addEventListener('click', refreshJobs);
+    document.getElementById('emailFavorites').addEventListener('click', emailFavorites);
+
+    renderFavoritesBadge();
+    fetchJobs();
+    loadStats();
+</script>
+{% endblock %}

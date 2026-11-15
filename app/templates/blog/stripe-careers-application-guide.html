@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Stripe Careers: Application Tips + Live Openings{% endblock %}
+{% block meta_description %}Everything you need to know about applying to Stripe — engineering, product, design, and operations roles. Live openings and insider tips from Stripe's hiring process.{% endblock %}
+{% block meta_keywords %}Stripe jobs, Stripe careers, how to get hired at Stripe, Stripe engineering jobs, Stripe application tips, Stripe interview{% endblock %}
+{% block og_title %}Stripe Careers: Application Tips + Live Openings{% endblock %}
+{% block og_description %}Insider tips on applying to Stripe — what recruiters look for, the interview process, and how to find live openings.{% endblock %}
+
+{% block content %}
+<article class="content-page blog-post">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="/blog">Blog</a>
+        <span aria-hidden="true">/</span>
+        <span>Stripe Careers</span>
+    </nav>
+
+    <header class="post-header">
+        <span class="blog-category">Company Guides</span>
+        <h1>Stripe Careers: Application Tips + Live Openings</h1>
+        <time datetime="2026-11-05">November 5, 2026</time>
+    </header>
+
+    <section class="post-body">
+        <p class="lead">Stripe has a reputation as one of the hardest companies to get into — and one of the best to work for. Their hiring bar is notoriously high, but it's not arbitrary. Stripe looks for specific signals that most candidates miss entirely.</p>
+
+        <h2>What Makes Stripe Different</h2>
+
+        <p>Stripe doesn't function like a typical Silicon Valley startup. They've been deliberate about culture from day one. Here are the traits that actually matter:</p>
+
+        <ul>
+            <li><strong>Writing clarity.</strong> Stripe's culture is built on written communication. Your application materials should demonstrate you can structure an argument, write with precision, and explain trade-offs.</li>
+            <li><strong>User obsession.</strong> Even backend infrastructure roles at Stripe are evaluated through a "what does this mean for the user?" lens. Every decision is downstream of merchant impact.</li>
+            <li><strong>Long-term thinking.</strong> Stripe optimizes for 10-year outcomes. In interviews, they're listening for whether you think in systems and second-order effects.</li>
+        </ul>
+
+        <h2>Finding Live Stripe Openings</h2>
+
+        <p>Stripe uses <strong>Lever</strong> as their ATS. Their official careers page lives at <code>stripe.com/jobs</code> and pulls from Lever's API. The roles update frequently — some positions open and close within a single week.</p>
+
+        <p>We poll Stripe's Lever board directly. You can <a href="/companies/stripe">browse all live Stripe openings</a> with direct apply links — no aggregator delay, no dead listings.</p>
+
+        <h2>The Stripe Interview Process</h2>
+
+        <p>Stripe's process is thorough and consistent across functions:</p>
+
+        <ol>
+            <li><strong>Recruiter screen</strong> (30 min) — basic fit, timeline, and role alignment</li>
+            <li><strong>Hiring manager screen</strong> (45 min) — deeper on background, motivation, and specific experience</li>
+            <li><strong>Take-home or live coding</strong> (engineering) / <strong>Case study</strong> (product, ops, design) — this is where most candidates are filtered</li>
+            <li><strong>Onsite or virtual onsite</strong> (4–5 hours) — 4–5 interviews covering coding, system design, values, and a "Stripeyness" behavioral round</li>
+            <li><strong>Bar-raiser interview</strong> — a senior leader who has veto power, focused on whether you raise the team's average</li>
+        </ol>
+
+        <h2>What the Take-Home Looks Like</h2>
+
+        <p>For engineering roles, Stripe's take-home is famously practical. You're not solving LeetCode hards. You're building a small system that looks like something Stripe actually deals with — handling webhooks, building a simple API, or reasoning about payment state machines.</p>
+
+        <p>The evaluation criteria:</p>
+        <ul>
+            <li>Does it work? (Functionality)</li>
+            <li>Is it maintainable? (Code quality, tests, documentation)</li>
+            <li>Does it handle edge cases? (Error handling, idempotency, retries)</li>
+            <li>Can you explain your trade-offs? (Interview discussion)</li>
+        </ul>
+
+        <h2>Product & Design at Stripe</h2>
+
+        <p>Stripe's product and design functions are tightly coupled. Designers are expected to understand API constraints. Product managers are expected to write clearly and reason about developer experience.</p>
+
+        <p>For product roles, expect case interviews around:</p>
+        <ul>
+            <li>How would you launch Stripe in a new country?</li>
+            <li>How would you improve onboarding for a specific merchant segment?</li>
+            <li>How do you prioritize between fraud reduction and conversion?</li>
+        </ul>
+
+        <h2>High-Volume Roles to Watch</h2>
+
+        <p>Based on our board polling data, these functions have the most consistent opening volume at Stripe:</p>
+        <ul>
+            <li><a href="/roles/software-engineer">Software Engineer</a> — backend, infrastructure, and platform</li>
+            <li><a href="/roles/backend-engineer">Backend Engineer</a> — distributed systems, payments infrastructure</li>
+            <li><a href="/roles/product-manager">Product Manager</a> — platform, financial products, developer tools</li>
+            <li>Staff+ Engineers — Stripe invests heavily in IC tracks</li>
+            <li>Sales & Account Management — especially for enterprise and international</li>
+        </ul>
+
+        <h2>One Tip That Actually Moves the Needle</h2>
+
+        <p>Write a <strong>concise, specific cover letter</strong>. Not a generic "I'm passionate about fintech" paragraph. Something like:</p>
+
+        <blockquote>"I built a payment reconciliation system at [Company] handling $50M/year. I made two specific architectural decisions that reduced latency by 40% — [explain]. I'm applying to Stripe's Payments Infrastructure team because [specific reason tied to Stripe's work]."</blockquote>
+
+        <p>Stripe's recruiters read cover letters. A bad one gets ignored. A good one gets forwarded.</p>
+
+        <p><a href="/companies/stripe" class="btn btn-solid">See live Stripe openings →</a></p>
+    </section>
+</article>
+{% endblock %}

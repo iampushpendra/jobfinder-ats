@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Why Job Aggregators Show Dead Listings (and How We Fix It){% endblock %}
+{% block meta_description %}That perfect role you found on a job board? It might have closed weeks ago. Here's what job aggregators won't tell you about dead listings — and how we solve it.{% endblock %}
+{% block meta_keywords %}dead job listings, fake job postings, why job boards have closed roles, job aggregator problems, how to find real job openings{% endblock %}
+{% block og_title %}Why Job Aggregators Show Dead Listings (and How We Fix It){% endblock %}
+{% block og_description %}Job aggregators are full of listings that closed weeks ago. Here's why that happens and how we built something better.{% endblock %}
+
+{% block content %}
+<article class="content-page blog-post">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="/blog">Blog</a>
+        <span aria-hidden="true">/</span>
+        <span>Dead Listings</span>
+    </nav>
+
+    <header class="post-header">
+        <span class="blog-category">Job Search Tips</span>
+        <h1>Why Job Aggregators Show Dead Listings (and How We Fix It)</h1>
+        <time datetime="2026-10-28">October 28, 2026</time>
+    </header>
+
+    <section class="post-body">
+        <p class="lead">You spend an hour tailoring your resume. You craft the perfect cover letter. You click apply — and the role closed three weeks ago. Or worse, it was never real in the first place. This isn't a bug. It's a business model.</p>
+
+        <h2>The Incentive Problem</h2>
+
+        <p>Job aggregators — the big names you know — make money from engagement, not outcomes. Their primary revenue comes from employers who pay to promote listings and from ads served to job seekers. More listings = more page views = more revenue. Whether those listings are current is secondary.</p>
+
+        <p>Here's how dead listings happen:</p>
+
+        <ul>
+            <li><strong>Scrape once, never update.</strong> Aggregators crawl company career pages periodically — sometimes weekly, sometimes monthly. A role that closed yesterday still shows as "active."</li>
+            <li><strong>Employer ghost listings.</strong> Some companies leave roles posted even when they're not actively hiring — to build a talent pipeline, meet diversity optics, or keep their employer brand visible.</li>
+            <li><strong>Expired API tokens.</strong> When a company switches ATS providers or changes their careers page, aggregators often keep serving cached data for weeks.</li>
+            <li><strong>Deliberate bait.</strong> Some aggregators show attractive roles that don't exist to get you to create an account or upload a resume.</li>
+        </ul>
+
+        <h2>The Real Cost to Job Seekers</h2>
+
+        <p>The average tech job seeker applies to 50–80 roles. If 20% of those are dead listings — a conservative estimate — that's 10–16 hours of wasted effort. More importantly, it erodes motivation. Nothing kills momentum like ghost applications.</p>
+
+        <p>Beyond time, there's an opportunity cost. The roles that <em>are</em> real and fresh get buried under pages of outdated listings. By the time you find them, they've already received 200+ applications.</p>
+
+        <h2>How We Built Something Different</h2>
+
+        <p>We don't scrape. We <strong>poll APIs directly</strong> — the same APIs that power the companies' own job boards.</p>
+
+        <ul>
+            <li><strong>Greenhouse API:</strong> We hit <code>boards-api.greenhouse.io</code> directly for companies like Airbnb, Cloudflare, and Stripe</li>
+            <li><strong>Lever API:</strong> We query <code>api.lever.co</code> for Spotify, Palantir, and others</li>
+            <li><strong>Ashby API:</strong> We connect to <code>api.ashbyhq.com</code> for OpenAI, Ramp, and more</li>
+        </ul>
+
+        <p>When a company closes a role on their own board, it disappears from our feed within hours — not weeks. When they open a new one, it appears immediately. There is no middleman, no caching delay, no incentive to keep dead listings alive.</p>
+
+        <h2>The Technical Difference</h2>
+
+        <p>Here's what most job seekers don't know: ATS boards (Greenhouse, Lever, Ashby) are designed to be the source of truth. They power the company's own careers page, their internal recruiting dashboard, and their application routing. When a role is marked "closed" in Greenhouse, it vanishes from the API response. Period.</p>
+
+        <p>Aggregators, by contrast, often store listings in their own database and update them on a schedule. That schedule might be daily, weekly, or "when we get to it." The result is a graveyard of roles that closed days or weeks ago but still show as "active" on the aggregator.</p>
+
+        <h2>What You Can Do Right Now</h2>
+
+        <ol>
+            <li><strong>Apply on the company's own board.</strong> If you find a role on an aggregator, click through to the company's careers page and apply there instead. Your application gets tracked properly and your data stays structured.</li>
+            <li><strong>Check the posting date.</strong> If a "great" role has been open for 90+ days, be skeptical. Top companies fill competitive roles in 2–4 weeks.</li>
+            <li><strong>Use a direct-source board.</strong> Our <a href="/">job board</a> polls company ATS APIs directly. Every listing links to the company's official apply page. If it's closed, it's gone from our feed.</li>
+        </ol>
+
+        <h2>The Bottom Line</h2>
+
+        <p>Job searching is hard enough without applying to ghosts. The fix is simple: go to the source. Use the company's own ATS board, not a middleman that profits from listing volume regardless of accuracy. Your time is worth more than that.</p>
+
+        <p><a href="/" class="btn btn-solid">Browse live, verified openings →</a></p>
+    </section>
+</article>
+{% endblock %}
