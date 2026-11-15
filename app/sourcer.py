@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 import requests
 
-MAX_JOBS_PER_COMPANY = 50
+MAX_JOBS_PER_COMPANY = 100
 DEFAULT_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "jobs.db")
 
 # Boards verified to answer publicly. fortune500 is set only for companies on
@@ -19,17 +19,30 @@ DEFAULT_DB = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file
 # Google, Microsoft and Amazon use Workday or their own portals, so they can't
 # be sourced here.
 COMPANIES = {
+    # ── Greenhouse ─────────────────────────────────────────────────
     "airbnb": {"name": "Airbnb", "ats": "greenhouse", "slug": "airbnb"},
+    "block": {"name": "Block", "ats": "greenhouse", "slug": "block"},
+    "brex": {"name": "Brex", "ats": "greenhouse", "slug": "brex"},
     "cloudflare": {"name": "Cloudflare", "ats": "greenhouse", "slug": "cloudflare"},
     "coinbase": {"name": "Coinbase", "ats": "greenhouse", "slug": "coinbase"},
+    "databricks": {"name": "Databricks", "ats": "greenhouse", "slug": "databricks"},
     "datadog": {"name": "Datadog", "ats": "greenhouse", "slug": "datadog"},
+    "dropbox": {"name": "Dropbox", "ats": "greenhouse", "slug": "dropbox"},
+    "figma": {"name": "Figma", "ats": "greenhouse", "slug": "figma"},
     "gitlab": {"name": "GitLab", "ats": "greenhouse", "slug": "gitlab"},
     "hp": {"name": "HP", "ats": "greenhouse", "slug": "hp", "fortune500": True},
+    "instacart": {"name": "Instacart", "ats": "greenhouse", "slug": "instacart"},
+    "lyft": {"name": "Lyft", "ats": "greenhouse", "slug": "lyft"},
     "pinterest": {"name": "Pinterest", "ats": "greenhouse", "slug": "pinterest"},
     "reddit": {"name": "Reddit", "ats": "greenhouse", "slug": "reddit"},
     "stripe": {"name": "Stripe", "ats": "greenhouse", "slug": "stripe"},
+    "twilio": {"name": "Twilio", "ats": "greenhouse", "slug": "twilio"},
+    "vercel": {"name": "Vercel", "ats": "greenhouse", "slug": "vercel"},
+    # ── Ashby ──────────────────────────────────────────────────────
     "openai": {"name": "OpenAI", "ats": "ashby", "slug": "openai"},
     "ramp": {"name": "Ramp", "ats": "ashby", "slug": "ramp"},
+    "linear": {"name": "Linear", "ats": "ashby", "slug": "linear"},
+    # ── Lever ──────────────────────────────────────────────────────
     "palantir": {"name": "Palantir", "ats": "lever", "slug": "palantir"},
     "spotify": {"name": "Spotify", "ats": "lever", "slug": "spotify"},
 }

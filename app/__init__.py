@@ -99,6 +99,41 @@ BLOG_POSTS = [
         "date": "2026-10-28",
         "category": "Job Search Tips",
     },
+    {
+        "slug": "coinbase-jobs-engineering-product-design",
+        "title": "Coinbase Jobs: Engineering, Product & Design Roles",
+        "description": "A complete guide to Coinbase careers — engineering, product, and design openings with insider application tips.",
+        "date": "2026-11-12",
+        "category": "Company Guides",
+    },
+    {
+        "slug": "palantir-careers-what-they-look-for",
+        "title": "Palantir Careers: What They Look For + How to Apply",
+        "description": "Insider tips on Palantir's unique hiring process — Forward Deployed Engineer, engineering, and BD roles.",
+        "date": "2026-11-09",
+        "category": "Company Guides",
+    },
+    {
+        "slug": "datadog-jobs-engineering-data-science",
+        "title": "Datadog Jobs: Engineering & Data Science Openings",
+        "description": "A guide to Datadog careers — engineering, data science, and SRE roles at the cloud monitoring leader.",
+        "date": "2026-11-06",
+        "category": "Company Guides",
+    },
+    {
+        "slug": "best-companies-work-2026-live-openings",
+        "title": "Best Companies to Work for in 2026 — Live Openings",
+        "description": "The best tech companies to work for in 2026, ranked by culture, growth, and hiring volume.",
+        "date": "2026-11-03",
+        "category": "Career Guide",
+    },
+    {
+        "slug": "track-job-applications-favorites-tool",
+        "title": "How to Track Job Applications: Our Free Favorites Tool",
+        "description": "Stop losing track of your job applications. Save roles, track status, and email yourself a shortlist.",
+        "date": "2026-10-25",
+        "category": "Job Search Tips",
+    },
 ]
 
 
@@ -244,6 +279,46 @@ Sitemap: /sitemap.xml
             xml += f"  <url><loc>{u}</loc></url>\n"
         xml += "</urlset>\n"
         return Response(xml, mimetype="application/xml")
+
+    # ── Weekly Digest ───────────────────────────────────────────────
+
+    @app.route("/weekly/<date_str>")
+    def weekly_digest(date_str):
+        """Show jobs first seen on a specific week."""
+        ensure_synced()
+        all_jobs = sourcer.search_jobs()
+        # Filter jobs whose first_seen falls in the week starting date_str
+        from datetime import datetime, timedelta
+        try:
+            week_start = datetime.strptime(date_str, "%Y-%m-%d")
+            week_end = week_start + timedelta(days=7)
+        except ValueError:
+            return render_template("pages/404.html", stats=stats()), 404
+
+        # Find jobs first seen this week
+        week_jobs = []
+        for job in all_jobs:
+            if job.get("posted"):
+                try:
+                    posted = datetime.fromisoformat(job["posted"].replace("Z", "+00:00"))
+                    if week_start <= posted < week_end:
+                        week_jobs.append(job)
+                except (ValueError, TypeError):
+                    pass
+            elif job.get("first_seen"):
+                try:
+                    first = datetime.fromisoformat(job["first_seen"].replace("Z", "+00:00"))
+                    if week_start <= first < week_end:
+                        week_jobs.append(job)
+                except (ValueError, TypeError):
+                    pass
+
+        return render_template("pages/weekly.html",
+                               date_str=date_str,
+                               week_start=week_start.strftime("%B %d, %Y"),
+                               week_end=week_end.strftime("%B %d, %Y"),
+                               jobs=week_jobs,
+                               stats=stats())
 
     # ── API routes (unchanged) ──────────────────────────────────────
 

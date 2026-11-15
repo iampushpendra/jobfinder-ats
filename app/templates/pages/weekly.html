@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}New Jobs {{ week_start }} — {{ week_end }} | Weekly Digest{% endblock %}
+{% block meta_description %}New tech jobs posted the week of {{ week_start }}. Sourced directly from company ATS boards at Stripe, OpenAI, Databricks, and more.{% endblock %}
+{% block og_title %}New Jobs — Week of {{ week_start }}{% endblock %}
+{% block og_description %}Fresh tech openings this week from top companies. Direct apply links, no dead listings.{% endblock %}
+
+{% block content %}
+<article class="content-page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <span>Weekly Digest</span>
+    </nav>
+
+    <h1>New Jobs: {{ week_start }} — {{ week_end }}</h1>
+    <p class="lede">Fresh openings posted this week, sourced directly from company ATS boards. Every link goes to the official posting — apply before these roles fill.</p>
+
+    {% if jobs %}
+    <section class="jobs-listing" aria-label="New job openings this week">
+        <p class="results-count">{{ jobs | length }} new role{{ 's' if jobs | length > 1 else '' }}</p>
+        {% for job in jobs %}
+        <article class="card job-card">
+            <div class="card-top">
+                <div class="company">
+                    <span class="monogram" aria-hidden="true">{{ job.company[0] }}</span>
+                    <span class="company-name">{{ job.company }}</span>
+                </div>
+                {% if job.fortune500 %}
+                <span class="pill pill-f500">Fortune 500</span>
+                {% endif %}
+            </div>
+            <h2 class="job-title">
+                <a href="{{ job.url }}" target="_blank" rel="noopener">{{ job.title }}</a>
+            </h2>
+            <div class="meta">
+                <span class="chip">{{ job.location }}</span>
+                {% if job.function %}
+                <span class="chip">{{ job.function }}</span>
+                {% endif %}
+                <span class="chip chip-source">{{ job.source }}</span>
+            </div>
+            <div class="card-foot">
+                <span class="host">{{ job.url | replace('https://', '') | replace('http://', '') | replace('www.', '') }}</span>
+                <a class="btn btn-solid" href="{{ job.url }}" target="_blank" rel="noopener">Apply ↗</a>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}
+    <div class="empty">
+        <p class="empty-title">No new roles detected for this week.</p>
+        <p class="empty-hint">Try a different week or <a href="/">browse all current openings</a>.</p>
+    </div>
+    {% endif %}
+
+    <section class="related-links">
+        <h2>More ways to browse</h2>
+        <div class="link-group">
+            <a href="/">All jobs</a>
+            <a href="/locations/remote">Remote jobs</a>
+            <a href="/roles/software-engineer">Software engineer jobs</a>
+            <a href="/blog">Career tips</a>
+        </div>
+    </section>
+</article>
+{% endblock %}

@@ -6,6 +6,31 @@
 {% block og_title %}{{ role }} Jobs at Top Tech Companies{% endblock %}
 {% block og_description %}Live {{ role }} openings at Stripe, OpenAI, Airbnb, Cloudflare, and more. Sourced directly from official ATS boards.{% endblock %}
 
+{% block extra_head %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+        {% for job in jobs %}
+        {
+            "@type": "ListItem",
+            "position": {{ loop.index }},
+            "item": {
+                "@type": "JobPosting",
+                "title": "{{ job.title }}",
+                "hiringOrganization": {"@type": "Organization", "name": "{{ job.company }}"},
+                "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressLocality": "{{ job.location }}"}},
+                "directApply": "true",
+                "url": "{{ job.url }}"
+            }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <article class="content-page">
     <nav class="breadcrumbs" aria-label="Breadcrumb">

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Datadog Jobs: Engineering & Data Science Openings{% endblock %}
+{% block meta_description %}A guide to Datadog careers — engineering, data science, and SRE roles. What Datadog looks for and how to stand out in their hiring process.{% endblock %}
+{% block meta_keywords %}Datadog jobs, Datadog careers, how to get hired at Datadog, Datadog engineering jobs, Datadog SRE, Datadog remote jobs{% endblock %}
+{% block og_title %}Datadog Jobs: Engineering & Data Science Openings{% endblock %}
+{% block og_description %}Find live Datadog openings and learn what makes a candidate stand out at the cloud monitoring leader.{% endblock %}
+
+{% block content %}
+<article class="content-page blog-post">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="/blog">Blog</a>
+        <span aria-hidden="true">/</span>
+        <span>Datadog Careers</span>
+    </nav>
+
+    <header class="post-header">
+        <span class="blog-category">Company Guides</span>
+        <h1>Datadog Jobs: Engineering & Data Science Openings</h1>
+        <time datetime="2026-11-06">November 6, 2026</time>
+    </header>
+
+    <section class="post-body">
+        <p class="lead">Datadog processes trillions of data points per day. Their platform monitors everything from Kubernetes clusters to serverless functions for 26,000+ customers. Working there means building systems that don't just scale — they scale at a scale most engineers never see.</p>
+
+        <h2>What Datadog Actually Builds</h2>
+
+        <p>Datadog's product isn't a single tool — it's an observability platform with a dozen integrated products: infrastructure monitoring, APM, log management, security monitoring, real user monitoring, and more. Each product is a distributed system that ingests, processes, and queries petabytes of data in real time.</p>
+
+        <p>This means Datadog engineers work on genuinely hard problems:</p>
+        <ul>
+            <li><strong>High-throughput data pipelines.</strong> Ingesting millions of events per second with sub-second query latency</li>
+            <li><strong>Distributed query engines.</strong> Supporting complex analytics across trillions of data points</li>
+            <li><strong>Auto-scaling infrastructure.</strong> Running on AWS, GCP, and Azure simultaneously with zero downtime</li>
+            <li><strong>Security.</strong> Detecting threats across customer infrastructure in real time</li>
+        </ul>
+
+        <h2>Finding Live Datadog Openings</h2>
+
+        <p>Datadog uses <strong>Greenhouse</strong> for their ATS. Their board is actively maintained and roles update frequently — especially in engineering and SRE. We poll their Greenhouse API directly so our listings are always current.</p>
+
+        <p><a href="/companies/datadog">Browse live Datadog openings</a> with direct apply links.</p>
+
+        <h2>The Datadog Engineering Bar</h2>
+
+        <p>Datadog's interview process is rigorous but fair. It typically involves:</p>
+
+        <ol>
+            <li><strong>Recruiter screen</strong> — standard fit conversation</li>
+            <li><strong>Coding interview</strong> — LeetCode medium, often with a systems twist (e.g., "design a rate limiter for a distributed system")</li>
+            <li><strong>System design</strong> — Heavy emphasis on distributed systems: "Design a time-series database" or "How would you shard a metrics ingestion pipeline?"</li>
+            <li><strong>Domain deep-dive</strong> — For SRE roles, expect Kubernetes, Terraform, and incident management questions. For data roles, expect streaming architecture and SQL optimization</li>
+            <li><strong>Behavioral</strong> — Datadog values ownership and operational excellence. Be ready with stories about running production systems</li>
+        </ol>
+
+        <h2>Remote at Datadog</h2>
+
+        <p>Datadog has offices in New York, Paris, and other hubs, but many roles are remote-friendly within specific regions. The key detail: Datadog is explicit about timezone requirements in their job postings. A "remote" role might require Americas overlap (EST/PST) or EMEA overlap (CET).</p>
+
+        <p>This transparency is rare and valuable. You know before applying whether your timezone works.</p>
+
+        <h2>High-Volume Roles</h2>
+
+        <p>These functions have the most consistent opening volume at Datadog:</p>
+        <ul>
+            <li><a href="/roles/software-engineer">Software Engineer</a> — backend, infrastructure, and platform teams</li>
+            <li><a href="/roles/backend-engineer">Backend Engineer</a> — data ingestion, query engines, and storage systems</li>
+            <li>SRE / Platform Engineer — Kubernetes, Terraform, and observability tooling</li>
+            <li><a href="/roles/data-scientist">Data Scientist / Data Engineer</a> — analytics pipelines and ML infrastructure</li>
+            <li>Security Engineer — threat detection and cloud security posture management</li>
+        </ul>
+
+        <h2>Why Datadog Stands Out</h2>
+
+        <p>Unlike many monitoring companies that bolted on features, Datadog was built as a unified platform from the start. Their engineers don't just write code — they operate it at a scale that forces deep understanding of distributed systems, fault tolerance, and performance optimization.</p>
+
+        <p>If you're an engineer who wants to work on genuinely hard infrastructure problems with immediate customer impact, Datadog is one of the best places in tech.</p>
+
+        <p><a href="/companies/datadog" class="btn btn-solid">See live Datadog openings →</a></p>
+    </section>
+</article>
+{% endblock %}
