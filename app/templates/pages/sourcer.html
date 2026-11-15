@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Live Data — Jobs Sourced from Greenhouse, Lever & Ashby{% endblock %}
+{% block meta_description %}Real-time job sourcing dashboard. See how many jobs we pull from each company ATS board — Greenhouse, Lever, and Ashby — updated live.{% endblock %}
+{% block og_title %}Live Data — Job Sourcing Dashboard{% endblock %}
+{% block og_description %}Real-time counts of jobs sourced directly from company ATS boards.{% endblock %}
+
+{% block content %}
+<article class="content-page">
+    <div class="dashboard-hero">
+        <h1>Live Sourcing Dashboard</h1>
+        <p class="lede">Every job on this board comes from a real company ATS. No scraping. No stale data. Here's exactly what we're tracking right now.</p>
+    </div>
+
+    {# ── Top Metrics ──────────────────────────────────────────── #}
+    <div class="metric-grid reveal">
+        <div class="metric-card">
+            <div class="metric-number">{{ stats.total }}</div>
+            <div class="metric-label">Total Jobs</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-number accent">{{ stats.fortune500_jobs }}</div>
+            <div class="metric-label">Fortune 500</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-number">{{ stats.companies }}</div>
+            <div class="metric-label">Companies</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-number">{{ stats.by_source | length }}</div>
+            <div class="metric-label">ATS Sources</div>
+        </div>
+    </div>
+
+    {# ── Source Breakdown ───────────────────────────────────── #}
+    <section class="chart-section reveal reveal-delay-1">
+        <h2>Jobs by ATS Source</h2>
+        {% set max_source = (stats.by_source.values() | list | max) if stats.by_source else 1 %}
+        {% for source, count in stats.by_source | dictsort(by='value', reverse=true) %}
+        <div class="chart-row">
+            <span class="chart-name">{{ source | capitalize }}</span>
+            <div class="chart-bar-wrap">
+                <div class="chart-bar {{ source }}" style="width: {{ (count / max_source * 100) | int }}%"></div>
+            </div>
+            <span class="chart-count">{{ count }}</span>
+        </div>
+        {% endfor %}
+        <div class="source-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span> Greenhouse</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#6366f1"></span> Lever</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> Ashby</span>
+        </div>
+    </section>
+
+    {# ── Company Breakdown ──────────────────────────────────── #}
+    <section class="chart-section reveal reveal-delay-2">
+        <h2>Jobs by Company</h2>
+        {% for c in companies %}
+        <div class="chart-row">
+            <span class="chart-name">
+                <a href="/companies/{{ c.key }}">{{ c.name }}</a>
+            </span>
+            <div class="chart-bar-wrap">
+                <div class="chart-bar {{ c.ats }}{% if c.fortune500 %} f500{% endif %}" style="width: {{ (c.job_count / max_jobs * 100) | int }}%"></div>
+            </div>
+            <span class="chart-count">{{ c.job_count }}</span>
+        </div>
+        {% endfor %}
+        <div class="source-legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span> Greenhouse</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#6366f1"></span> Lever</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span> Ashby</span>
+            <span class="legend-item"><span class="legend-dot" style="background:var(--f500-ink)"></span> Fortune 500</span>
+        </div>
+    </section>
+
+    {# ── Last Sync ──────────────────────────────────────────── #}
+    <section class="chart-section reveal reveal-delay-3">
+        <h2>Sync Status</h2>
+        <div class="chart-row">
+            <span class="chart-name">Last synced</span>
+            <span style="color:var(--ink-2); font-size:0.875rem;">{{ stats.last_sync or 'Never' }}</span>
+            <span></span>
+        </div>
+        <div class="chart-row">
+            <span class="chart-name">Sync method</span>
+            <span style="color:var(--ink-2); font-size:0.875rem;">Direct API polling (Greenhouse, Lever, Ashby)</span>
+            <span></span>
+        </div>
+        <div class="chart-row">
+            <span class="chart-name">Update cadence</span>
+            <span style="color:var(--ink-2); font-size:0.875rem;">Real-time on refresh; background sync every 6 hours</span>
+            <span></span>
+        </div>
+    </section>
+
+    <section class="cta-section" style="margin-top:3rem; text-align:center;">
+        <a href="/" class="btn btn-solid">Browse all {{ stats.total }} jobs →</a>
+    </section>
+</article>
+{% endblock %}

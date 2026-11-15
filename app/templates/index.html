@@ -25,28 +25,28 @@
     <h1>Good roles, straight from the source.</h1>
     <p class="lede">Sourced live from Greenhouse, Lever and Ashby boards. Every apply link opens the company's own posting — no aggregators, no dead listings.</p>
 
-    <dl class="stats">
-        <div class="stat">
-            <dt>Open roles</dt>
-            <dd id="stat-total">{{ stats.total }}</dd>
+    <div class="stats-bar reveal">
+        <div class="stat-cell">
+            <div class="stat-value" id="stat-total">{{ stats.total }}</div>
+            <div class="stat-label">Open roles</div>
         </div>
-        <div class="stat">
-            <dt>Companies</dt>
-            <dd id="stat-companies">{{ stats.companies }}</dd>
+        <div class="stat-cell">
+            <div class="stat-value accent" id="stat-companies">{{ stats.companies }}</div>
+            <div class="stat-label">Companies</div>
         </div>
-        <div class="stat">
-            <dt>Fortune 500 roles</dt>
-            <dd id="stat-f500">{{ stats.fortune500_jobs }}</dd>
+        <div class="stat-cell">
+            <div class="stat-value" id="stat-f500">{{ stats.fortune500_jobs }}</div>
+            <div class="stat-label">Fortune 500 roles</div>
         </div>
-        <div class="stat">
-            <dt>Favorites</dt>
-            <dd id="fav-count">0</dd>
+        <div class="stat-cell">
+            <div class="stat-value accent" id="fav-count">0</div>
+            <div class="stat-label">Favorites</div>
         </div>
-    </dl>
+    </div>
 </section>
 
-<section class="browse-links" aria-label="Browse by category">
-    <h2 class="sr-only">Browse jobs</h2>
+<section class="browse-section reveal reveal-delay-1" aria-label="Browse by category">
+    <p class="browse-eyebrow">Browse by</p>
     <div class="browse-grid">
         <a class="browse-card" href="/roles/software-engineer">
             <span class="browse-icon">💻</span>
@@ -83,7 +83,7 @@
     </div>
 </section>
 
-<section class="controls" aria-label="Filters">
+<section class="controls reveal reveal-delay-2" aria-label="Filters">
     <div class="fields">
         <div class="field">
             <label class="sr-only" for="filterFunction">Filter by function</label>
@@ -177,7 +177,7 @@
                                     aria-label="${isFav ? 'Remove from favorites' : 'Save to favorites'}">
                                 ${isFav ? '★' : '☆'}
                             </button>
-                            <a class="btn btn-solid" href="${esc(job.url)}" target="_blank" rel="noopener">Apply ↗</a>
+                            <a class="btn btn-solid" href="${esc(job.url)}" target="_blank" rel="noopener">Apply <span class="btn-icon">↗</span></a>
                         </div>
                     </div>
                 </article>`;
@@ -232,9 +232,11 @@
     async function refreshJobs() {
         const btn = document.getElementById('syncBtn');
         btn.disabled = true;
+        btn.textContent = 'Syncing…';
         await fetch('/api/sync', {method: 'POST'});
         await Promise.all([fetchJobs(), loadStats()]);
         btn.disabled = false;
+        btn.innerHTML = 'Refresh <span class="btn-icon">↻</span>';
     }
 
     document.getElementById('jobsList').addEventListener('click', e => {

@@ -127,6 +127,41 @@ def create_app(test_config=None):
     def about():
         return render_template("pages/about.html", stats=stats())
 
+    @app.route("/sourcer")
+    def sourcer_dashboard():
+        ensure_synced()
+        s = stats()
+        # Build company data with direct links to their ATS boards
+        companies_data = []
+        for key, cfg in sourcer.COMPANIES.items():
+            company_jobs = sourcer.search_jobs() if s["total"] else []
+            company_jobs = [j for j in company_jobs if j["company"] == cfg["name"]]
+            # Build ATS board URL
+            if cfg["ats"] == "greenhouse":
+                board_url = f"https://boards.greenhouse.io/{cfg['slug']}"
+            elif cfg["ats"] == "lever":
+                board_url = f"https://jobs.lever.co/{cfg['slug']}"
+            elif cfg["ats"] == "ashby":
+                board_url = f"https://jobs.ashbyhq.com/{cfg['slug']}"
+            else:
+                board_url = "#"
+            companies_data.append({
+                "key": key,
+                "name": cfg["name"],
+                "ats": cfg["ats"],
+                "slug": cfg["slug"],
+                "fortune500": cfg.get("fortune500", False),
+                "job_count": len(company_jobs),
+                "board_url": board_url,
+            })
+        # Sort by job count descending
+        companies_data.sort(key=lambda x: x["job_count"], reverse=True)
+        max_jobs = max((c["job_count"] for c in companies_data), default=1)
+        return render_template("pages/sourcer.html",
+                               stats=s,
+                               companies=companies_data,
+                               max_jobs=max_jobs)
+
     @app.route("/companies/<company_key>")
     def company_page(company_key):
         cfg = sourcer.COMPANIES.get(company_key)
