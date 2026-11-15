@@ -1,0 +1,452 @@
+/* Fortune 500 Job Board — quiet, editorial, one accent. */
+
+:root {
+    --bg: #fbfbf9;
+    --surface: #ffffff;
+    --ink: #0d0d0f;
+    --ink-2: #55555c;
+    --ink-3: #89898f;
+    --line: #e8e8e3;
+    --line-strong: #d5d5cd;
+    --accent: #141418;
+    --on-accent: #ffffff;
+    --f500-ink: #8a5200;
+    --f500-bg: #fdf2dd;
+    --focus: #2563eb;
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(13, 13, 15, 0.04);
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0b0b0c;
+        --surface: #131316;
+        --ink: #f4f4f2;
+        --ink-2: #a8a8ae;
+        --ink-3: #7c7c83;
+        --line: #26262b;
+        --line-strong: #3a3a41;
+        --accent: #f4f4f2;
+        --on-accent: #0b0b0c;
+        --f500-ink: #f0c070;
+        --f500-bg: #2a2113;
+        --focus: #7aa2ff;
+        --shadow: none;
+    }
+}
+
+* { box-sizing: border-box; }
+* { margin: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+    width: min(1120px, 100% - 2.5rem);
+    margin-inline: auto;
+}
+
+/* ── Header ──────────────────────────────────────────────────────── */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--line);
+}
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 0;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.brand-name span { color: var(--ink-2); font-weight: 500; }
+
+.header-actions { display: flex; gap: 0.5rem; }
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.5rem 0.85rem;
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 550;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease);
+}
+
+.btn-solid { background: var(--accent); color: var(--on-accent); }
+.btn-solid:hover { opacity: 0.88; }
+
+.btn-ghost {
+    background: transparent;
+    border-color: var(--line-strong);
+    color: var(--ink-2);
+}
+.btn-ghost:hover { color: var(--ink); border-color: var(--ink-3); }
+
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+:where(a, button, input):focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────── */
+.hero { padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(1.75rem, 4vw, 2.5rem); }
+
+.hero h1 {
+    font-size: clamp(2rem, 1.35rem + 2.6vw, 3rem);
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    font-weight: 640;
+    max-width: 22ch;
+}
+
+.lede {
+    margin-top: 0.9rem;
+    max-width: 60ch;
+    color: var(--ink-2);
+    font-size: 1.0625rem;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 2.25rem;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.stat {
+    background: var(--surface);
+    padding: 1rem 1.15rem 1.1rem;
+}
+
+.stat dt {
+    font-size: 0.75rem;
+    font-weight: 550;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+}
+
+.stat dd {
+    margin-top: 0.35rem;
+    font-size: clamp(1.4rem, 1.15rem + 0.7vw, 1.75rem);
+    font-weight: 620;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Controls ────────────────────────────────────────────────────── */
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+    flex: 1 1 340px;
+}
+
+.input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    font: inherit;
+    font-size: 0.875rem;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    transition: border-color 140ms var(--ease), background-color 140ms var(--ease);
+}
+
+.input::placeholder { color: var(--ink-3); }
+.input:hover { border-color: var(--line-strong); }
+.input:focus { outline: none; border-color: var(--line-strong); background: var(--surface); box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 14%, transparent); }
+
+.check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--ink-2);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.check input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+/* ── Jobs grid ───────────────────────────────────────────────────── */
+.jobs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+    padding: 1.5rem 0 3rem;
+}
+
+@media (min-width: 840px) {
+    .jobs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 1.15rem 1.25rem 1.05rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition: border-color 160ms var(--ease), transform 160ms var(--ease);
+}
+
+.job-card:hover {
+    border-color: var(--line-strong);
+    transform: translateY(-2px);
+}
+
+.card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.company { display: inline-flex; align-items: center; gap: 0.5rem; min-width: 0; }
+
+.monogram {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: 7px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ink-2);
+}
+
+.company-name {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ink-2);
+    letter-spacing: 0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pill {
+    flex: none;
+    font-size: 0.6875rem;
+    font-weight: 650;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+}
+
+.pill-f500 { color: var(--f500-ink); background: var(--f500-bg); }
+
+.job-title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+    text-wrap: pretty;
+}
+
+.job-title a {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.job-title a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+
+.meta { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.chip {
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    padding: 0.18rem 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chip-source { text-transform: capitalize; color: var(--ink-3); }
+
+.card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.35rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line);
+}
+
+.host {
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-actions { display: inline-flex; align-items: center; gap: 0.5rem; flex: none; }
+
+.fav-btn {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--ink-3);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 140ms var(--ease), border-color 140ms var(--ease), background-color 140ms var(--ease);
+}
+
+.fav-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+
+.fav-btn[aria-pressed="true"] { color: var(--f500-ink); background: var(--f500-bg); border-color: transparent; }
+
+.is-fav { border-color: color-mix(in srgb, var(--f500-ink) 30%, var(--line)); }
+
+/* ── States ──────────────────────────────────────────────────────── */
+.skeleton {
+    min-height: 168px;
+    border-style: dashed;
+    background: linear-gradient(100deg, var(--surface) 40%, var(--bg) 50%, var(--surface) 60%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+}
+
+.empty {
+    grid-column: 1 / -1;
+    padding: 3.5rem 1rem;
+    text-align: center;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius);
+}
+
+.empty-title { font-weight: 600; }
+.empty-hint { color: var(--ink-3); font-size: 0.875rem; margin-top: 0.25rem; }
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+.site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 1.25rem 0 2rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+}
+
+/* ── Small screens ───────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .header-actions .btn-ghost { display: none; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .fields { grid-template-columns: 1fr; }
+    .controls { align-items: stretch; }
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+    .job-card:hover { transform: none; }
+}
