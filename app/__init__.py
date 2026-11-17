@@ -250,6 +250,79 @@ def create_app(test_config=None):
             return render_template("pages/404.html", stats=stats()), 404
         return render_template(f"blog/{slug}.html", post=post, posts=BLOG_POSTS, stats=stats())
 
+    # ── AI Content Generator (Admin) ──────────────────────────────────
+
+    @app.route("/admin/ai")
+    def ai_generator():
+        """Admin page for AI-powered content generation using free OpenRouter models."""
+        api_key_set = bool(os.environ.get("OPENROUTER_API_KEY", ""))
+        # Build list of companies with job counts for the generator
+        ensure_synced()
+        companies_data = []
+        all_jobs = sourcer.search_jobs() if stats()["total"] else []
+        for key, cfg in sourcer.COMPANIES.items():
+            company_jobs = [j for j in all_jobs if j["company"] == cfg["name"]]
+            titles = list(dict.fromkeys([j["title"] for j in company_jobs]))[:6]
+            companies_data.append({
+                "key": key,
+                "name": cfg["name"],
+                "ats": cfg["ats"],
+                "job_count": len(company_jobs),
+                "top_titles": titles,
+            })
+        companies_data.sort(key=lambda x: x["job_count"], reverse=True)
+
+        # Available free models
+        from .openrouter import DEFAULT_FREE_MODELS
+        return render_template("pages/ai-generator.html",
+                               api_key_set=api_key_set,
+                               models=DEFAULT_FREE_MODELS,
+                               companies=companies_data,
+                               stats=stats())
+
+    @app.route("/admin/ai/generate", methods=["POST"])
+    def ai_generate():
+        """AJAX endpoint to generate content."""
+        data = request.get_json(silent=True) or {}
+        content_type = data.get("type", "blog")
+        company_key = data.get("company_key", "")
+        role_title = data.get("role", "")
+
+        if content_type == "blog" and company_key in sourcer.COMPANIES:
+            cfg = sourcer.COMPANIES[company_key]
+            jobs = sourcer.search_jobs()
+            company_jobs = [j for j in jobs if j["company"] == cfg["name"]]
+            from . import openrouter as or_api
+            result = or_api.generate_for_company(company_key, cfg, company_jobs)
+            return jsonify({"success": True, **result})
+
+        if content_type == "meta" and company_key in sourcer.COMPANIES:
+            cfg = sourcer.COMPANIES[company_key]
+            jobs = sourcer.search_jobs()
+            company_jobs = [j for j in jobs if j["company"] == cfg["name"]]
+            titles = [j["title"] for j in company_jobs]
+            from . import openrouter as or_api
+            meta = or_api.generate_company_meta_description(
+                company_name=cfg["name"],
+                job_count=len(company_jobs),
+                top_roles=titles[:6],
+            )
+            return jsonify({"success": True, "meta_description": meta})
+
+        if content_type == "role_guide" and role_title:
+            jobs = sourcer.search_jobs()
+            role_jobs = [j for j in jobs if role_title.lower() in j.get("function", "").lower() or role_title.lower() in j["title"].lower()]
+            companies = list(dict.fromkeys([j["company"] for j in role_jobs]))[:8]
+            from . import openrouter as or_api
+            guide = or_api.generate_role_guide(
+                role_title=role_title,
+                companies_hiring=companies,
+                total_openings=len(role_jobs),
+            )
+            return jsonify({"success": True, "guide_html": guide})
+
+        return jsonify({"success": False, "error": "Invalid parameters"}), 400
+
     # ── SEO utilities ────────────────────────────────────────────────
 
     @app.route("/robots.txt")

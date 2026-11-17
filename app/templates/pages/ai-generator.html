@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}AI Content Generator — Auto-Generate SEO Articles (Free Models){% endblock %}
+{% block meta_description %}Generate SEO-optimized blog articles, company guides, and meta descriptions using free AI models from OpenRouter. No cost, no API fees.{% endblock %}
+
+{% block content %}
+<article class="content-page">
+    <div class="dashboard-hero">
+        <h1>AI Content Generator</h1>
+        <p class="lede">Auto-generate SEO articles, company guides, and meta descriptions using <strong>free AI models</strong> from OpenRouter. Zero cost. No API fees.</p>
+    </div>
+
+    {# ── Status ───────────────────────────────────────────────── #}
+    <div class="metric-grid reveal" style="margin-top:1rem;">
+        <div class="metric-card">
+            <div class="metric-number accent">{{ models | length }}</div>
+            <div class="metric-label">Free Models</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-number">{{ companies | length }}</div>
+            <div class="metric-label">Companies</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-number">{% if api_key_set %}✓{% else %}✗{% endif %}</div>
+            <div class="metric-label">API Key</div>
+        </div>
+    </div>
+
+    {% if not api_key_set %}
+    <div class="empty" style="margin-top:2rem; text-align:left;">
+        <p class="empty-title">OpenRouter API key not configured</p>
+        <p class="empty-hint">
+            Get a free API key at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>,
+            then set the environment variable <code>OPENROUTER_API_KEY</code> and restart the server.
+            All models used here are on the <strong>free tier</strong> — no charges, no credit card required.
+        </p>
+    </div>
+    {% endif %}
+
+    {# ── Available Models ─────────────────────────────────────── #}
+    <section class="chart-section reveal reveal-delay-1">
+        <h2>Available Free Models</h2>
+        {% for m in models %}
+        <div class="chart-row">
+            <span class="chart-name" style="text-align:left;">{{ m }}</span>
+            <span style="font-size:0.75rem; color:var(--success); font-weight:600;">FREE TIER</span>
+            <span></span>
+        </div>
+        {% endfor %}
+    </section>
+
+    {# ── Generate Company Blog Article ────────────────────────── #}
+    <section class="chart-section reveal reveal-delay-2">
+        <h2>Generate Company Blog Article</h2>
+        <p style="color:var(--ink-2); font-size:0.875rem; margin-bottom:1rem;">
+            Creates a full SEO article (800-1200 words) with interview tips, hiring process details, and role recommendations.
+        </p>
+        <div class="fields" style="grid-template-columns: 1fr auto; gap:0.75rem; align-items:end;">
+            <div class="field">
+                <label for="genCompany" style="display:block; font-size:0.8125rem; font-weight:600; color:var(--ink-2); margin-bottom:0.4rem;">Select company</label>
+                <select id="genCompany" class="input" {% if not api_key_set %}disabled{% endif %}>
+                    <option value="">Choose a company…</option>
+                    {% for c in companies %}
+                    <option value="{{ c.key }}">{{ c.name }} ({{ c.job_count }} jobs — {{ c.ats }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button id="btnGenBlog" class="btn btn-solid" {% if not api_key_set %}disabled{% endif %}>
+                Generate Article
+            </button>
+        </div>
+        <div id="blogOutput" style="margin-top:1rem; display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-size:0.8125rem; font-weight:600;">Generated HTML</span>
+                <button id="btnCopyBlog" class="btn btn-ghost btn-sm">Copy HTML</button>
+            </div>
+            <pre id="blogResult" style="background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); padding:1rem; font-size:0.8rem; overflow:auto; max-height:400px; white-space:pre-wrap; word-break:break-word;"></pre>
+        </div>
+        <div id="blogLoading" style="margin-top:1rem; display:none;" class="empty">
+            <p class="empty-title">Generating article…</p>
+            <p class="empty-hint">This may take 30-60 seconds on free models. Please wait.</p>
+        </div>
+    </section>
+
+    {# ── Generate Meta Description ────────────────────────────── #}
+    <section class="chart-section reveal reveal-delay-2">
+        <h2>Generate Meta Description</h2>
+        <p style="color:var(--ink-2); font-size:0.875rem; margin-bottom:1rem;">
+            Auto-generates an SEO meta description (&lt;160 chars) for any company page.
+        </p>
+        <div class="fields" style="grid-template-columns: 1fr auto; gap:0.75rem; align-items:end;">
+            <div class="field">
+                <select id="genMetaCompany" class="input" {% if not api_key_set %}disabled{% endif %}>
+                    <option value="">Choose a company…</option>
+                    {% for c in companies %}
+                    <option value="{{ c.key }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button id="btnGenMeta" class="btn btn-solid" {% if not api_key_set %}disabled{% endif %}>
+                Generate Meta
+            </button>
+        </div>
+        <div id="metaOutput" style="margin-top:1rem; display:none;">
+            <div style="background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); padding:1rem;">
+                <p id="metaResult" style="font-size:0.875rem; color:var(--ink-2); font-style:italic; margin:0;"></p>
+                <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
+                    <span id="metaCharCount" style="font-size:0.75rem; color:var(--ink-3);"></span>
+                </div>
+            </div>
+        </div>
+        <div id="metaLoading" style="margin-top:1rem; display:none;" class="empty">
+            <p class="empty-title">Generating meta description…</p>
+        </div>
+    </section>
+
+    {# ── Generate Role Guide ──────────────────────────────────── #}
+    <section class="chart-section reveal reveal-delay-3">
+        <h2>Generate Role Guide</h2>
+        <p style="color:var(--ink-2); font-size:0.875rem; margin-bottom:1rem;">
+            Creates a comprehensive career guide for any role type (e.g., "Software Engineer", "Product Manager").
+        </p>
+        <div class="fields" style="grid-template-columns: 1fr auto; gap:0.75rem; align-items:end;">
+            <div class="field">
+                <input id="genRole" class="input" type="text" placeholder="Role title — e.g. Software Engineer, Data Scientist…" {% if not api_key_set %}disabled{% endif %}>
+            </div>
+            <button id="btnGenRole" class="btn btn-solid" {% if not api_key_set %}disabled{% endif %}>
+                Generate Guide
+            </button>
+        </div>
+        <div id="roleOutput" style="margin-top:1rem; display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+                <span style="font-size:0.8125rem; font-weight:600;">Generated HTML</span>
+                <button id="btnCopyRole" class="btn btn-ghost btn-sm">Copy HTML</button>
+            </div>
+            <pre id="roleResult" style="background:var(--bg); border:1px solid var(--line); border-radius:var(--radius); padding:1rem; font-size:0.8rem; overflow:auto; max-height:400px; white-space:pre-wrap; word-break:break-word;"></pre>
+        </div>
+        <div id="roleLoading" style="margin-top:1rem; display:none;" class="empty">
+            <p class="empty-title">Generating role guide…</p>
+            <p class="empty-hint">Please wait while the AI writes your content.</p>
+        </div>
+    </section>
+
+    <section class="cta-section" style="margin-top:3rem; text-align:center;">
+        <a href="/" class="btn btn-solid">← Back to Job Board</a>
+    </section>
+</article>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function postGenerate(type, company_key, role) {
+        const res = await fetch('/admin/ai/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type, company_key, role})
+        });
+        return res.json();
+    }
+
+    // Blog article generator
+    document.getElementById('btnGenBlog').addEventListener('click', async () => {
+        const key = document.getElementById('genCompany').value;
+        if (!key) return;
+        document.getElementById('blogLoading').style.display = 'block';
+        document.getElementById('blogOutput').style.display = 'none';
+        try {
+            const data = await postGenerate('blog', key, '');
+            document.getElementById('blogLoading').style.display = 'none';
+            if (data.success) {
+                document.getElementById('blogResult').textContent = data.blog_html;
+                document.getElementById('blogOutput').style.display = 'block';
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        } catch (e) {
+            document.getElementById('blogLoading').style.display = 'none';
+            alert('Failed: ' + e.message);
+        }
+    });
+
+    document.getElementById('btnCopyBlog').addEventListener('click', () => {
+        const text = document.getElementById('blogResult').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('btnCopyBlog');
+            const old = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = old, 1500);
+        });
+    });
+
+    // Meta description generator
+    document.getElementById('btnGenMeta').addEventListener('click', async () => {
+        const key = document.getElementById('genMetaCompany').value;
+        if (!key) return;
+        document.getElementById('metaLoading').style.display = 'block';
+        document.getElementById('metaOutput').style.display = 'none';
+        try {
+            const data = await postGenerate('meta', key, '');
+            document.getElementById('metaLoading').style.display = 'none';
+            if (data.success) {
+                document.getElementById('metaResult').textContent = data.meta_description;
+                document.getElementById('metaCharCount').textContent = data.meta_description.length + ' characters' + (data.meta_description.length > 160 ? ' ⚠️ too long' : ' ✓');
+                document.getElementById('metaOutput').style.display = 'block';
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        } catch (e) {
+            document.getElementById('metaLoading').style.display = 'none';
+            alert('Failed: ' + e.message);
+        }
+    });
+
+    // Role guide generator
+    document.getElementById('btnGenRole').addEventListener('click', async () => {
+        const role = document.getElementById('genRole').value.trim();
+        if (!role) return;
+        document.getElementById('roleLoading').style.display = 'block';
+        document.getElementById('roleOutput').style.display = 'none';
+        try {
+            const data = await postGenerate('role_guide', '', role);
+            document.getElementById('roleLoading').style.display = 'none';
+            if (data.success) {
+                document.getElementById('roleResult').textContent = data.guide_html;
+                document.getElementById('roleOutput').style.display = 'block';
+            } else {
+                alert('Error: ' + (data.error || 'Unknown error'));
+            }
+        } catch (e) {
+            document.getElementById('roleLoading').style.display = 'none';
+            alert('Failed: ' + e.message);
+        }
+    });
+
+    document.getElementById('btnCopyRole').addEventListener('click', () => {
+        const text = document.getElementById('roleResult').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = document.getElementById('btnCopyRole');
+            const old = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => btn.textContent = old, 1500);
+        });
+    });
+</script>
+{% endblock %}
